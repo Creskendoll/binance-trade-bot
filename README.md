@@ -56,6 +56,8 @@ Create a .cfg file named `user.cfg` based off `.user.cfg.example`, then add your
 -   **tld** - 'com' or 'us', depending on your region. Default is 'com'.
 -   **hourToKeepScoutHistory** - Controls how many hours of scouting values are kept in the database. After the amount of time specified has passed, the information will be deleted.
 -   **scout_sleep_time** - Controls how many seconds are waited between each scout.
+-   **use_margin** - 'yes' to use scout_margin. 'no' to use scout_multiplier.
+-   **scout_margin** - Minimum percentage coin gain per trade. 0.8 translates to a scout multiplier of 5 at 0.1% fee.
 -   **scout_multiplier** - Controls the value by which the difference between the current state of coin ratios and previous state of ratios is multiplied. For bigger values, the bot will wait for bigger margins to arrive before making a trade.
 -   **strategy** - The trading strategy to use. See [`binance_trade_bot/strategies`](binance_trade_bot/strategies/README.md) for more information
 -   **buy_timeout/sell_timeout** - Controls how many minutes to wait before cancelling a limit order (buy/sell) and returning to "scout" mode. 0 means that the order will never be cancelled prematurely.
@@ -80,7 +82,9 @@ SELL_TIMEOUT: 0
 ```
 
 ### Paying Fees with BNB
+
 You can [use BNB to pay for any fees on the Binance platform](https://www.binance.com/en/support/faq/115000583311-Using-BNB-to-Pay-for-Fees), which will reduce all fees by 25%. In order to support this benefit, the bot will always perform the following operations:
+
 -   Automatically detect that you have BNB fee payment enabled.
 -   Make sure that you have enough BNB in your account to pay the fee of the inspected trade.
 -   Take into consideration the discount when calculating the trade threshold.
