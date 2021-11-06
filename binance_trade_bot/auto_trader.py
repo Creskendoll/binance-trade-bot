@@ -74,9 +74,9 @@ class AutoTrader:
                         "Skipping update for coin {} not found".format(pair.from_coin + self.config.BRIDGE)
                     )
                     continue
-                
+
                 # check if we hold above min_notional coins of from_coin. If so skip ratio update.
-                from_coin_balance = self.manager.get_currency_balance(pair.from_coin.symbol)          
+                from_coin_balance = self.manager.get_currency_balance(pair.from_coin.symbol)
                 min_notional = self.manager.get_min_notional(pair.from_coin.symbol, self.config.BRIDGE.symbol)
                 if from_coin_price * from_coin_balance > min_notional:
                     continue
@@ -152,24 +152,15 @@ class AutoTrader:
             to_fee = self.manager.get_fee(pair.to_coin, self.config.BRIDGE, False)
             transaction_fee = from_fee + to_fee - from_fee * to_fee
 
-            if self.config.USE_MARGIN == "yes":
-                ratio_dict[pair] = (
-                    (1- transaction_fee) * coin_opt_coin_ratio / pair.ratio - 1 - self.config.SCOUT_MARGIN / 100
-                )
-            else:
+            if self.config.RATIO_CALC == self.config.RATIO_CALC_DEFAULT:
+                transaction_fee = from_fee + to_fee
                 ratio_dict[pair] = (
                     coin_opt_coin_ratio - transaction_fee * self.config.SCOUT_MULTIPLIER * coin_opt_coin_ratio
                 ) - pair.ratio
-
-        return ratio_dict
-
-                ratio_dict[pair] = (
-                    coin_opt_coin_ratio - transaction_fee * self.config.SCOUT_MULTIPLIER * coin_opt_coin_ratio
-                ) - pair.ratio
-            if self.config.RATIO_CALC == self.config.RATIO_CALC_SCOUT_MARGIN:
+            elif self.config.RATIO_CALC == self.config.RATIO_CALC_SCOUT_MARGIN:
                 transaction_fee = from_fee + to_fee - from_fee * to_fee
-
                 ratio_dict[pair] = (1 - transaction_fee) * coin_opt_coin_ratio / pair.ratio - (1 + self.config.SCOUT_MULTIPLIER / 100)
+
         self.db.batch_log_scout(scout_logs)
         return (ratio_dict, prices)
 

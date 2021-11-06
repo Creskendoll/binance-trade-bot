@@ -32,9 +32,9 @@ class AbstractOrderBalanceManager(ABC):
         pass
 
     def make_order(
-        self, 
-        side: str, 
-        symbol: str, 
+        self,
+        side: str,
+        symbol: str,
         quantity: float,
         quote_quantity: float,
         price: float
@@ -222,7 +222,7 @@ class BinanceAPIManager:
             return self.get_ask_price(ticker_symbol)
         else:
             return self.get_ticker_price(ticker_symbol)
-            
+
     def get_sell_price(self, ticker_symbol: str):
         price_type = self.config.PRICE_TYPE
         if price_type == Config.PRICE_TYPE_ORDERBOOK:
@@ -284,7 +284,7 @@ class BinanceAPIManager:
             if price is None:
                 self.logger.info(f"Ticker does not exist: {ticker_symbol} - will not be fetched from now on")
                 self.cache.non_existent_tickers.add(ticker_symbol)
-        
+
         return price
 
     def get_currency_balance(self, currency_symbol: str, force=False) -> float:
@@ -468,7 +468,7 @@ class BinanceAPIManager:
 
     @staticmethod
     def float_as_decimal_str(num: float):
-        return f"{num:0.08f}".rstrip("0").rstrip(".")  # remove trailing zeroes too    
+        return f"{num:0.08f}".rstrip("0").rstrip(".")  # remove trailing zeroes too
 
     def _buy_alt(self, origin_coin: Coin, target_coin: Coin, buy_price: float, buy_quantity: float=None):  # pylint: disable=too-many-locals
         """
@@ -498,7 +498,7 @@ class BinanceAPIManager:
             order_quantity = self._buy_quantity(origin_symbol, target_symbol, target_balance, from_coin_price)
         else:
             order_quantity = buy_quantity
-        self.logger.info(f"Buying {order_quantity} of <{origin_symbol}> at price {from_coin_price}")
+        self.logger.info(f"Buying {order_quantity} {origin_symbol} at price {from_coin_price}")
 
         # Try to buy until successful
         order = None
@@ -512,12 +512,14 @@ class BinanceAPIManager:
                     quote_quantity=target_balance,
                     price=from_coin_price,
                 )
-                self.logger.info(order, False)
             except BinanceAPIException as e:
                 self.logger.info(e)
                 time.sleep(1)
             except Exception as e:  # pylint: disable=broad-except
                 self.logger.warning(f"Unexpected Error: {e}")
+
+        self.logger.info("----- BUY ORDER -----", False)
+        self.logger.info(order, False)
 
         executed_qty = float(order.get("executedQty", 0))
         if executed_qty > 0 and order["status"] == "FILLED":
@@ -570,7 +572,7 @@ class BinanceAPIManager:
         trade_log = self.db.start_trade_log(origin_coin, target_coin, True)
 
         order_quantity = self._sell_quantity(origin_symbol, target_symbol, origin_balance)
-        self.logger.info(f"Selling {order_quantity} of {origin_symbol} at price {rounded_from_coin_price}")
+        self.logger.info(f"Selling {order_quantity} {origin_symbol} at price {from_coin_price}")
 
         self.logger.info(f"Balance is {origin_balance}")
         order = None
@@ -584,14 +586,13 @@ class BinanceAPIManager:
                     quote_quantity=from_coin_price * order_quantity,
                     price=from_coin_price,
                 )
-                self.logger.info(order, False)
             except BinanceAPIException as e:
                 self.logger.info(e)
                 time.sleep(1)
             except Exception as e:  # pylint: disable=broad-except
                 self.logger.warning(f"Unexpected Error: {e}")
 
-        self.logger.info("order", False)
+        self.logger.info("----- SELL ORDER -----", False)
         self.logger.info(order, False)
 
         trade_log.set_ordered(origin_balance, target_balance, order_quantity)
@@ -655,9 +656,9 @@ class PaperOrderBalanceManager(AbstractOrderBalanceManager):
         return {}
 
     def make_order(
-        self, 
-        side: str, 
-        symbol: str, 
+        self,
+        side: str,
+        symbol: str,
         quantity: float,
         quote_quantity: float,
         price: float
@@ -678,7 +679,7 @@ class PaperOrderBalanceManager(AbstractOrderBalanceManager):
             # probably should be a better idea to make it a postponed call
             self._write_persist()
 
-        self.fake_order_id += 1       
+        self.fake_order_id += 1
 
         forder = BinanceOrder(
             defaultdict(

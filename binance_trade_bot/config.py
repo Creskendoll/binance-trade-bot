@@ -15,7 +15,7 @@ class Config:  # pylint: disable=too-few-public-methods,too-many-instance-attrib
 
     PRICE_TYPE_ORDERBOOK = "orderbook"
     PRICE_TYPE_TICKER = "ticker"
-    
+
     RATIO_CALC_DEFAULT = "default"
     RATIO_CALC_SCOUT_MARGIN = "scout_margin"
 
@@ -24,8 +24,6 @@ class Config:  # pylint: disable=too-few-public-methods,too-many-instance-attrib
         config = configparser.ConfigParser()
         config["DEFAULT"] = {
             "bridge": "USDT",
-            "use_margin": "no",
-            "scout_margin": "0.8",
             "scout_multiplier": "5",
             "scout_sleep_time": "5",
             "hourToKeepScoutHistory": "1",
@@ -106,8 +104,6 @@ class Config:  # pylint: disable=too-few-public-methods,too-many-instance-attrib
 
         self.SELL_TIMEOUT = os.environ.get("SELL_TIMEOUT") or config.get(USER_CFG_SECTION, "sell_timeout")
         self.BUY_TIMEOUT = os.environ.get("BUY_TIMEOUT") or config.get(USER_CFG_SECTION, "buy_timeout")
-        self.USE_MARGIN = os.environ.get("USE_MARGIN") or config.get(USER_CFG_SECTION, "use_margin")
-        self.SCOUT_MARGIN = float(os.environ.get("SCOUT_MARGIN") or config.get(USER_CFG_SECTION, "scout_margin"))
 
         order_type_map = {
             self.ORDER_TYPE_LIMIT: binance.client.Client.ORDER_TYPE_LIMIT,

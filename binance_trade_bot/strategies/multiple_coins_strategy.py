@@ -13,9 +13,8 @@ class Strategy(AutoTrader):
         # Display on the console, the current coin+Bridge, so users can see *some* activity and not think the bot
         # has stopped. Not logging though to reduce log size.
         print(
-            f"{self.manager.now()} - CONSOLE - INFO - I am scouting the best trades. "
-            f"Current coins: {active_coins} ",
-            end="\r",
+            f"{self.manager.now()} - CONSOLE - INFO - Scouting the best trades for {active_coins}",
+            end="\n",
         )
 
         excluded_coins = []
@@ -26,7 +25,7 @@ class Strategy(AutoTrader):
             if coin_price is None:
                 self.logger.info("Skipping scouting... current coin {} not found".format(coin + self.config.BRIDGE))
                 continue
-            
+
             if self.config.ALLOW_COIN_MERGE == False:
                 #fetch active coin again to avoid some coins fusioning by jumping to the same coin in the same scout run
                 current_active_coins = self.get_active_coins()
@@ -53,9 +52,13 @@ class Strategy(AutoTrader):
             if coin_price is None:
                 self.logger.info("Skipping scouting... coin {} not found".format(coin + self.config.BRIDGE))
                 continue
-            
+
             min_notional = self.manager.get_min_notional(coin.symbol, self.config.BRIDGE.symbol)
-            if coin_price * current_coin_balance > min_notional:
+
+            bridge_value = coin_price * current_coin_balance
+            if bridge_value > min_notional:
+                print(f"Balance: {current_coin_balance} {coin.symbol} | {bridge_value} {self.config.BRIDGE.symbol}", end="\n")
+                print(f"Price {coin.symbol}/{self.config.BRIDGE.symbol}: {coin_price}", end="\n\n")
                 active_coins.append(coin)
 
         return active_coins
