@@ -14,7 +14,7 @@ class Strategy(AutoTrader):
         # has stopped. Not logging though to reduce log size.
         print(
             f"{self.manager.now()} - CONSOLE - INFO - Scouting the best trades for {active_coins}",
-            end="\n",
+            end="\r",
         )
 
         excluded_coins = []
@@ -57,8 +57,8 @@ class Strategy(AutoTrader):
 
             bridge_value = coin_price * current_coin_balance
             if bridge_value > min_notional:
-                print(f"Balance: {current_coin_balance} {coin.symbol} | {bridge_value} {self.config.BRIDGE.symbol}", end="\n")
-                print(f"Price {coin.symbol}/{self.config.BRIDGE.symbol}: {coin_price}", end="\n\n")
+                # print(f"Balance: {current_coin_balance} {coin.symbol} | {bridge_value} {self.config.BRIDGE.symbol}", end="\n")
+                # print(f"Price {coin.symbol}/{self.config.BRIDGE.symbol}: {coin_price}", end="\n\n")
                 active_coins.append(coin)
 
         return active_coins
